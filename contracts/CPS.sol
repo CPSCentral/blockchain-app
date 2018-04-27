@@ -3,63 +3,56 @@ pragma solidity ^0.4.18;
 contract CPS {
 
     struct CYACustomer {
-      string name;
-      Warranty[] warranty_array;
+      bytes name;
       uint cya_id;
+
     }
 
-    struct Model {
-      uint cya_id;
-      string name;
-      string manufacturer;
-    }
 
     struct Warranty {
         uint cya_warrantyserial;
-        Model model;
+        uint model_id;
+        bytes model_name;
+        bytes model_manufacturer;
     }
 
-    CYACustomer cya_customer;
+    CYACustomer public cya_customer;
+    Warranty[] warranty_array;
 
-    function createCustomer(string name, uint id) public returns(string){
+    function createCustomer(bytes name, uint id) public returns(bytes){
 
-      CYACustomer memory customer = CYACustomer({
-          cya_id: id,
-          name: name,
-          warranty_array: new Warranty[](0)
-      });
-
-      customer = cya_customer;
+       cya_customer = CYACustomer(name,id);
+ 
 
     }
 
-    function getCustomer() public returns (uint, string, uint){
-      return (cya_customer.cya_id, cya_customer.name, cya_customer.warranty_array.length);
+    function getCustomer() public returns (uint, bytes){
+      return (cya_customer.cya_id, cya_customer.name);
     }
-    
-    function addWarranty(uint cya_warrantyserial, uint cya_id, string modelName, string manufacturer) public returns(uint) {
-        cya_customer.warranty_array.length++;
-         cya_customer.warranty_array[ cya_customer.warranty_array.length-1].cya_warrantyserial = cya_warrantyserial;
-         cya_customer.warranty_array[ cya_customer.warranty_array.length-1].model.name = modelName;
-         cya_customer.warranty_array[ cya_customer.warranty_array.length-1].model.manufacturer = manufacturer;
-        return cya_customer.warranty_array.length;
+
+    function addWarranty(uint cya_warrantyserial, uint model_id, bytes model_name, bytes manufacturer) public returns(uint) {
+        warranty_array.length++;
+         warranty_array[ warranty_array.length-1].cya_warrantyserial = cya_warrantyserial;
+        warranty_array[ warranty_array.length-1].model_name = model_name;
+         warranty_array[ warranty_array.length-1].model_manufacturer = manufacturer;
+        return warranty_array.length;
     }
 
     function getWarrantyCount() public constant returns(uint) {
-        return cya_customer.warranty_array.length;
+        return warranty_array.length;
     }
 
-    function getWarrantyByArrayIndex(uint index) public constant returns(uint, string, string) {
+    function getWarrantyByArrayIndex(uint index) public constant returns(uint, bytes, bytes) {
 
-        return (cya_customer.warranty_array[index].cya_warrantyserial, cya_customer.warranty_array[index].model.name, cya_customer.warranty_array[index].model.manufacturer);
+        return (warranty_array[index].cya_warrantyserial, warranty_array[index].model_name, warranty_array[index].model_manufacturer);
     }
     
-    function getWarrantyBySerial(uint serial) public constant returns(uint, string, string) {
+    function getWarrantyBySerial(uint serial) public constant returns(uint, bytes, bytes) {
 
 
-        for (uint i=0;i<cya_customer.warranty_array.length;i++){
-          if(cya_customer.warranty_array[i].cya_warrantyserial==serial){
-              return (cya_customer.warranty_array[i].cya_warrantyserial,cya_customer.warranty_array[i].model.name,cya_customer.warranty_array[i].model.manufacturer);
+        for (uint i=0;i<warranty_array.length;i++){
+          if(warranty_array[i].cya_warrantyserial==serial){
+              return (warranty_array[i].cya_warrantyserial,warranty_array[i].model_name,warranty_array[i].model_manufacturer);
           }
         }
 

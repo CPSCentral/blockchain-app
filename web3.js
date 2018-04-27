@@ -13,36 +13,77 @@ const output = solc.compile(input.toString(), 1);
 const bytecode = output.contracts[':CPS'].bytecode;
 const abi = JSON.parse(output.contracts[':CPS'].interface);
 
+web3.eth.defaultAccount = web3.eth.accounts[0];
+
 // Contract object
 const contract = web3.eth.contract(abi);
 
-console.log(web3.eth.coinbase)
+exports.creatNewCustomerContract = function(id, name){
+    // Contract object
+    const contract = web3.eth.contract(abi);
+    // Returns promise object with tx hash after completing
+    return new Promise(function(resolve, reject){
+        contract.new({
+            data: '0x' + bytecode,
+            from: web3.eth.defaultAccount,
+            gas: 3000000
+        }, (err, res) => {
+            if (err) {
+                console.log(err);
+                resolve(false);
+            }
 
-module.exports = { createNewCustomerContract: function (){
+            // If we have an address property, the contract was deployed
+            if (res.address) {
 
-    console.log(web3.eth.coinbase)
-    // Deploy contract instance
-    const contractInstance = contract.new({
-        data: '0x' + bytecode,
-        from: web3.eth.coinbase,
-        gas: 3000000
-    }, (err, res) => {
-        if (err) {
-            console.log(err);
-            return false;
-        }
+                // Create customer in contract
+                contractInsance = contract.at(res.address);
+                
+                contractInsance.createCustomer.call(name, id, {
+                    gas:3000000,
+                    from: web3.eth.defaultAccount
+                })
+                
+                resolve({"Contract address":res.address, "Tx hash":res.transactionHash});
+                
+              
+               
+            }
+        });
 
-        // Log the tx, you can explore status with eth.getTransaction()
-        console.log(res.transactionHash);
-
-        // If we have an address property, the contract was deployed
-        if (res.address) {
-            console.log('Contract address: ' + res.address);
-            // Let's test the deployed contract
-          //  testContract(res.address);
-          return res.transactionHash
-        }
-    });
+    })
 
 }
+
+exports.addNewWarranty =  function(contract_address, warrantyserial, model_id, model_name, manufacturer){
+
+    contractInstance = contract.at(contract_address);
+
+    // Returns promise object with tx hash after completing warranty update
+    return new Promise(function(resolve, reject){
+
+        try {
+            resolve(contractInstance.addWarranty.call(warrantyserial,model_id, model_name, manufacturer,{
+                gas:3000000,
+                from: web3.eth.defaultAccount
+            }));
+        } catch (error) {
+            reject(error)
+        }
+
+    })
+}
+
+exports.getWarranties = function(contract_address){
+
+        contractInstance = contract.at(contract_address);
+    // Returns promise object all warranties
+        return new Promise(function(resolve, reject){
+
+            //var count = contractInstance.getWarrantyCount();
+            console.log( contractInstance.getWarrantyCount())
+            resolve(2);
+            
+        })
+
 }
