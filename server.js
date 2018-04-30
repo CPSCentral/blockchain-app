@@ -56,7 +56,9 @@ app.post('/new-warranty', function(req, res) {
                 response["Customer Contract"] ["Tx Hash"] = hashes["Tx Hash"],
 
                 // Now add customer's first warranty
+                console.log("Now adding customer's first warranty...");
                 blockchain.addNewWarranty(hashes["Contract address"], warrantyserial, model_id, model_name, manufacturer).then(function(hash){
+                    console.log("Success! Warranty hash is " + hash);
                     response["New Warranty"]["Tx Hash"]=hash;
                     res.json(response);
                 })

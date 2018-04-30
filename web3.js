@@ -46,8 +46,6 @@ exports.creatNewCustomerContract = function(id, name){
                 
                 resolve({"Contract address":res.address, "Tx hash":res.transactionHash});
                 
-              
-               
             }
         });
 
@@ -57,22 +55,29 @@ exports.creatNewCustomerContract = function(id, name){
 
 exports.addNewWarranty =  function(contract_address, warrantyserial, model_id, model_name, manufacturer){
 
-    contractInstance = contract.at(contract_address);
+    const contractInstance = contract.at(contract_address);
 
     // Returns promise object with tx hash after completing warranty update
     return new Promise(function(resolve, reject){
-
-        try {
-            resolve(contractInstance.addWarranty.call(warrantyserial,model_id, model_name, manufacturer,{
-                gas:3000000,
-                from: web3.eth.defaultAccount
-            }));
-        } catch (error) {
-            reject(error)
-        }
-
+        contractInstance.addWarranty.call(warrantyserial,model_id, model_name, manufacturer,{
+            gas:3000000,
+            data:{},
+            from: web3.eth.accounts[0]
+        }, (err,res) => {
+            console.log("Res "+res.address);
+            console.log("Error "+err);
+            resolve(res);
+        })
     })
-}
+      //  try {
+            
+        // } 
+        // catch (error) {
+        //     reject(error)
+        // }
+
+    }
+
 
 exports.getWarranties = function(contract_address){
 

@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 contract CPS {
 
     struct CYACustomer {
-      bytes name;
+      string name;
       uint cya_id;
 
     }
@@ -12,25 +12,25 @@ contract CPS {
     struct Warranty {
         uint cya_warrantyserial;
         uint model_id;
-        bytes model_name;
-        bytes model_manufacturer;
+        string model_name;
+        string model_manufacturer;
     }
 
     CYACustomer public cya_customer;
     Warranty[] warranty_array;
 
-    function createCustomer(bytes name, uint id) public returns(bytes){
+    function createCustomer(string name, uint id) public {
 
        cya_customer = CYACustomer(name,id);
- 
+  
 
     }
 
-    function getCustomer() public returns (uint, bytes){
+    function getCustomer() public returns (uint, string){
       return (cya_customer.cya_id, cya_customer.name);
     }
 
-    function addWarranty(uint cya_warrantyserial, uint model_id, bytes model_name, bytes manufacturer) public returns(uint) {
+    function addWarranty(uint cya_warrantyserial, uint model_id, string model_name, string manufacturer) public returns(uint) {
         warranty_array.length++;
          warranty_array[ warranty_array.length-1].cya_warrantyserial = cya_warrantyserial;
         warranty_array[ warranty_array.length-1].model_name = model_name;
@@ -42,12 +42,12 @@ contract CPS {
         return warranty_array.length;
     }
 
-    function getWarrantyByArrayIndex(uint index) public constant returns(uint, bytes, bytes) {
+    function getWarrantyByArrayIndex(uint index) public constant returns(uint, string, string) {
 
         return (warranty_array[index].cya_warrantyserial, warranty_array[index].model_name, warranty_array[index].model_manufacturer);
     }
     
-    function getWarrantyBySerial(uint serial) public constant returns(uint, bytes, bytes) {
+    function getWarrantyBySerial(uint serial) public constant returns(uint, string, string) {
 
 
         for (uint i=0;i<warranty_array.length;i++){

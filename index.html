@@ -1,0 +1,169 @@
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+<script>
+    var abi =[
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "cya_warrantyserial",
+				"type": "uint256"
+			},
+			{
+				"name": "model_id",
+				"type": "uint256"
+			},
+			{
+				"name": "model_name",
+				"type": "bytes"
+			},
+			{
+				"name": "manufacturer",
+				"type": "bytes"
+			}
+		],
+		"name": "addWarranty",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "serial",
+				"type": "uint256"
+			}
+		],
+		"name": "getWarrantyBySerial",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bytes"
+			},
+			{
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getWarrantyByArrayIndex",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bytes"
+			},
+			{
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "cya_customer",
+		"outputs": [
+			{
+				"name": "name",
+				"type": "bytes"
+			},
+			{
+				"name": "cya_id",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getCustomer",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "name",
+				"type": "bytes"
+			},
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "createCustomer",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getWarrantyCount",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    var host = "http://localhost:8545";
+    var web3 = new Web3(new Web3.providers.HttpProvider(host));
+
+    var contract = web3.eth.contract(abi);
+
+</script>
