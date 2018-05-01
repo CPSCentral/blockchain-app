@@ -1,10 +1,41 @@
 const fs = require('fs');
 const solc = require('solc');
 const Web3 = require('web3');
-
+const ethTx = require('ethereumjs-tx');
 
 // Connect to local Ethereum node
-const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/6Z8pW5MQzU4t0YIjKXVK"));
+
+const addressFrom = '0xd968F006E86C045B9e69754CF256955336c1a082'
+const privKey = '3cfc558703d00da417b82fcfaa622b394f4705ef285f09bf7a40cd24bdc0d6c0'
+
+const addressTo = '0x55C4bC75adcD82332CbF463bD9b7B92f4130Fb51'
+var version = web3.version.api;
+console.log(version); // "0.2.0"
+web3.eth.getTransactionCount(addressFrom).then(txCount => {
+
+    // construct the transaction data
+    const txParams = {
+      nonce: web3.utils.toHex(txCount),
+      gasLimit: web3.utils.toHex(25000),
+      gasPrice: web3.utils.toHex(10e9), // 10 Gwei
+      to: addressTo,
+      from: addressFrom,
+      value: web3.utils.toHex(web3.utils.toWei(123, 'wei'))
+    }
+    // Transaction is created
+    const tx = new ethTx(txParams);
+    const privKey = Buffer.from(privKey, 'hex');
+    // Transaction is signed
+    tx.sign(privKey);
+    const serializedTx = tx.serialize();
+    const rawTx = '0x' + serializedTx.toString('hex');
+    console.log(rawTx);
+  
+  })
+
+
+
 
 // Compile the source code
 const input = fs.readFileSync('contracts/CPS.sol');
@@ -92,3 +123,4 @@ exports.getWarranties = function(contract_address){
         })
 
 }
+
