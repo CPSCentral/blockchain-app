@@ -12,6 +12,9 @@ const abi = JSON.parse(output.contracts[':CPS'].interface);
 
 // Connect to Infura Ethereum node
 const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ credentials.network +".infura.io/"+credentials.infura_api_key));
+var version = web3.version;
+console.log(version); // "0.2.0"
+
 
 const gasLimit = 3000000;
 const gasPrice = 20000000; //2
