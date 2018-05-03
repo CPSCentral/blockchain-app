@@ -2,7 +2,18 @@ const fs = require('fs');
 const solc = require('solc');
 const Web3 = require('web3');
 const ethTx = require('ethereumjs-tx');
-const credentials = require('./credentials')
+const credentials =   {  network: '',
+infura_api_key: '',
+cps_public_key: '',
+cps_private_key: ''
+}
+try {
+    const credentials = require('./credentials')
+} catch (error) {
+    console.log('No credentials found')
+
+}
+
 
 // Compile the source code
 const input = fs.readFileSync('contracts/CPS.sol');
@@ -89,17 +100,6 @@ function createCustomer(request_data, contractAddress){
 
 }
 
-// var request_data={"model_name":"adsf",
-// "model_id":1234,
-// "manufacturer":"Apple",
-// "cya_warrantyserial":444}
-var address ='0xf43a495f427a67cb7ad599064a4147c49fa48308';
-// addWarranty(request_data,address)
-
-var contractInstance = new web3.eth.Contract(abi, address);
-
-
-
 function addWarranty(request_data, contractAddress ){
 
     var contractInstance = new web3.eth.Contract(abi, address);
@@ -124,7 +124,7 @@ exports.addNewWarranty =  function(contract_address, warrantyserial, model_id, m
             resolve(res);
         })
     })
-    
+
     }
 
 
@@ -146,7 +146,7 @@ exports.getWarranties = function(contract_address){
             contractInstance.methods.getWarrantyByArrayIndex(0).call().then(function(warranty){
 
                 var warranty_object = {
-                    "cya_warrantyserial"::warranty[0],
+                    "cya_warrantyserial":warranty[0],
                     "model_name":warranty[1],
                     "manufacturer": warranty[2]
                     }
@@ -157,7 +157,6 @@ exports.getWarranties = function(contract_address){
             
         })
 }
-this.getWarranties(address);
 
 function sendSign(data, contractAddress){
  
@@ -207,36 +206,4 @@ function sendSign(data, contractAddress){
     })
    
 }
-
-
-
-// function sendEther(addressFrom, privKey, addressTo, ether_amount) {
-
-//     amount =  web3.toWei(ether_amount, "ether");
-//     var rawTx = {
-//         nonce: web3.toHex(web3.eth.getTransactionCount(addressFrom)),
-//         gasLimit: web3.toHex(21000),
-//         gasPrice: web3.toHex(10e9), //10Gwei
-//         to: addressTo,
-//         from:addressFrom,
-//         value: web3.toHex(web3.toBigNumber(amount))
-    
-//     }
-    
-//     var privateKey = new Buffer(privKey, 'hex');
-//     var transaction = new ethTx(rawTx);
-//     transaction.sign(privateKey);
-//     var serializedTx = transaction.serialize().toString('hex');
-//     web3.eth.sendRawTransaction(
-//         '0x' + serializedTx, function(err, result) {
-//             if(err) {
-//                 console.log('error');
-//                 console.log(err);
-//             } else {
-//                 console.log('success');
-//                 console.log(result);
-//             }
-//         });
-// }
-
 
