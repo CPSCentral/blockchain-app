@@ -9,88 +9,103 @@ const input = fs.readFileSync('contracts/CPS.sol');
 const output = solc.compile(input.toString(), 1);
 
 const abi = JSON.parse(output.contracts[':CPS'].interface);
-
 // Connect to Infura Ethereum node
 const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ credentials.network +".infura.io/"+credentials.infura_api_key));
-var version = web3.version;
-console.log(version); // "0.2.0"
-
 
 const gasLimit = 3000000;
-const gasPrice = 20000000; //2
+const gasPrice = 2000000000; //2 gwei
 //2000000000 = 2 gwei
 web3.eth.defaultAccount = credentials.cps_public_key;
 
-// Contract object
-const contract = web3.eth.contract(abi);
 
-exports.creatNewCustomerContract = function(id,name) {
 
-    const bytecode = output.contracts[':CPS'].bytecode;
-    //console.log("bytecode: "+bytecode)
-    var rawTx = {
-        nonce: web3.toHex(web3.eth.getTransactionCount(web3.eth.defaultAccount )),
-        gasLimit: web3.toHex(gasLimit),
-        gasPrice: web3.toHex(gasPrice),
-        data: '0x'+ bytecode,
-        from:credentials.cps_public_key
-    };
+exports.creatNewCustomerContract = function(request_data) {
 
-    var privateKey = new Buffer(credentials.cps_private_key, 'hex');
-    var transaction = new ethTx(rawTx);
-
-    transaction.sign(privateKey);
-
-    var serializedTx = transaction.serialize().toString('hex');
+    var netId;
+    var transactionCount;
 
     return new Promise(function(resolve,reject){
-        web3.eth.sendRawTransaction(
-            '0x' + serializedTx, function(err, result) {
-                if(err) {
-                    reject(err)
-                   console.log(err);
-                } else {
-                    waitToAddCustomer(id,name, result );
-                    resolve(result);
-                    console.log(result);
-                }
-            })
-        }
-    )
-
-}
-
-function waitToAddCustomer(id,name, txhash){
+        web3.eth.net.getId().then(function(res){
+            netId=res;
     
-    var interval = 2000;
-    var txFound = false;
-    var count = 0;
-    var maxLoops = 10;
+            web3.eth.getTransactionCount(credentials.cps_public_key).then(function(res){
+                transactionCount=res;
+    
+                const bytecode = output.contracts[':CPS'].bytecode;
+                //console.log("bytecode: "+bytecode)
+                var rawTx = {
+                   nonce: web3.utils.toHex(transactionCount),
+                   chainId: netId,//web3.utils.toHex(3),
+                   gasLimit: web3.utils.toHex(gasLimit),
+                    gasPrice: web3.utils.toHex(gasPrice),
+                    data: '0x'+ bytecode,
+                    from: credentials.cps_public_key
+                };
+    
+                web3.eth.accounts.signTransaction(rawTx, credentials.cps_private_key).then(signed => {
+                    var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
+                
+                    tran.on('transactionHash', hash => {
+                      // Send response to client
+                      console.log("Tx Hash: " +  hash);
+                      resolve(hash);
+                    });
+                
+                    tran.on('receipt', receipt => {
+                    
+                        console.log("Function mined...");
+                    
+                     // block mined, now kickoff create customer function
+                     var address = receipt.contractAddress
+                      createCustomer(request_data, address);
+                      resolve(receipt.contractAddress);
 
-    // Loop and find when transaction is mined
-    var t = setInterval(function(){
+                    });
+                
+                    tran.on('error',reject(false));
+                  });
+    
+                  
+            })
+        })
+    
+    })
 
-        var receipt = web3.eth.getTransactionReceipt(txhash);
-        if (receipt != null) {
-            // Kickoff addWarranty using this contract address
-            console.log('Found contract! Adding customer...')
-            createCustomer(receipt.address, id, name);
-            clearInterval(t);
-        } else{
-            console.log("Contract didn't finished mining, trying again...")
-        }
-        if( count > maxLoops){
-            console.log('Max loops reached, exiting...')
-            clearInterval(t);
-        }
-        count++;
-
-    }, interval);
 
 }
 
-function createCustomer(contract_address, id, name){
-    const contractInstance = contract.at(contract_address);
+
+
+
+function createCustomer(request_data, contractAddress){
+
+    var contractInstance = new web3.eth.Contract(abi, contractAddress);
+    var data = contractInstance.methods.createCustomer(request_data.name,request_data.id).encodeABI();
+
+    sendSign(data, contractAddress).then(function(res){
+
+        addWarranty(request_data, contractAddress);
+    })
+
+}
+
+// var request_data={"model_name":"adsf",
+// "model_id":1234,
+// "manufacturer":"Apple",
+// "cya_warrantyserial":444}
+var address ='0xf43a495f427a67cb7ad599064a4147c49fa48308';
+// addWarranty(request_data,address)
+
+var contractInstance = new web3.eth.Contract(abi, address);
+
+
+
+function addWarranty(request_data, contractAddress ){
+
+    var contractInstance = new web3.eth.Contract(abi, address);
+    var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.model_id, request_data.model_name, request_data.manufacturer).encodeABI();
+    
+    sendSign(data, contractAddress);
 }
 
 exports.addNewWarranty =  function(contract_address, warrantyserial, model_id, model_name, manufacturer){
@@ -109,92 +124,119 @@ exports.addNewWarranty =  function(contract_address, warrantyserial, model_id, m
             resolve(res);
         })
     })
-      //  try {
-            
-        // } 
-        // catch (error) {
-        //     reject(error)
-        // }
-
+    
     }
+
 
 
 exports.getWarranties = function(contract_address){
 
-        contractInstance = contract.at(contract_address);
-    // Returns promise object all warranties
+    var contractInstance = new web3.eth.Contract(abi, address);
+
+        // Returns promise object all warranties
         return new Promise(function(resolve, reject){
 
-            //var count = contractInstance.getWarrantyCount();
-            console.log( contractInstance.getWarrantyCount())
-            resolve(2);
+                   
+        // First get count of warranty array
+        contractInstance.methods.getWarrantyCount().call().then(function(count){
+            
+            var count = parseInt(count)
+
+            // Then loop through and get each warranty
+            contractInstance.methods.getWarrantyByArrayIndex(0).call().then(function(warranty){
+
+                var warranty_object = {
+                    "cya_warrantyserial"::warranty[0],
+                    "model_name":warranty[1],
+                    "manufacturer": warranty[2]
+                    }
+                resolve(warranty_object)
+            })
+
+        })
             
         })
-
 }
+this.getWarranties(address);
 
-
-
-function sendEther(addressFrom, privKey, addressTo, ether_amount) {
-
-    amount =  web3.toWei(ether_amount, "ether");
-    var rawTx = {
-        nonce: web3.toHex(web3.eth.getTransactionCount(addressFrom)),
-        gasLimit: web3.toHex(21000),
-        gasPrice: web3.toHex(10e9), //10Gwei
-        to: addressTo,
-        from:addressFrom,
-        value: web3.toHex(web3.toBigNumber(amount))
-    
-    }
-    
-    var privateKey = new Buffer(privKey, 'hex');
-    var transaction = new ethTx(rawTx);
-    transaction.sign(privateKey);
-    var serializedTx = transaction.serialize().toString('hex');
-    web3.eth.sendRawTransaction(
-        '0x' + serializedTx, function(err, result) {
-            if(err) {
-                console.log('error');
-                console.log(err);
-            } else {
-                console.log('success');
-                console.log(result);
-            }
-        });
-}
-
-
-exports.getContractAddress = function(txHash){
-
-    var interval = 500;
-    var maxLoops = 10;
-    
+function sendSign(data, contractAddress){
+ 
     return new Promise(function(resolve,reject){
+        var netId;
+        var transactionCount;
+        
+        web3.eth.net.getId().then(function(res){
+            netId=res;
 
-        var txFound = false;
-        var count =0;
+            web3.eth.getTransactionCount(credentials.cps_public_key).then(function(res){
+                transactionCount=res;
+                console.log(transactionCount)
+        var rawTx = {
+            nonce:  web3.utils.toHex(transactionCount),
+            chainId: netId,//web3.utils.toHex(3),
+            gasLimit: web3.utils.toHex(gasLimit),
+             gasPrice: web3.utils.toHex(gasPrice),
+             data:  web3.utils.toHex(data),
+             from: credentials.cps_public_key,
+             to: contractAddress
+         };
+        
+        
+         
+         web3.eth.accounts.signTransaction(rawTx, credentials.cps_private_key).then(signed => {
 
-        while (!txFound && count < maxLoops ){
-            var receipt = web3.eth.getTransactionReceipt(txHash);
-            if (receipt != null) {
-                resolve(receipt);
-                txFound=true;
-            } 
-            setTimeout(function(){
-                console.log("tx not mined, looking again...");
-            },interval);
-            count++;
-        }
-        console.log("Not mined within max interval");
-        reject(false);
-
-
+            var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
+            
+            tran.on('transactionHash', hash => {
+              // Send response to client
+              console.log("Tx Hash: " +  hash);
+              resolve(hash)
+            });
+        
+            tran.on('receipt', receipt => {
+            
+                console.log("Receipt, at " +new Date()+  ":"+ receipt.contractAddress);
+        
+            });
+        
+            tran.on('error',console.error);
+          });
+        
+        })
+        })
     })
-
+   
 }
 
-//this.getContractAddress('0xdaf5233fd2305ac19f6b9811b054fe107594a4c7cb3a09877d73a822482a53c9')
 
-//.then(console.log);
+
+// function sendEther(addressFrom, privKey, addressTo, ether_amount) {
+
+//     amount =  web3.toWei(ether_amount, "ether");
+//     var rawTx = {
+//         nonce: web3.toHex(web3.eth.getTransactionCount(addressFrom)),
+//         gasLimit: web3.toHex(21000),
+//         gasPrice: web3.toHex(10e9), //10Gwei
+//         to: addressTo,
+//         from:addressFrom,
+//         value: web3.toHex(web3.toBigNumber(amount))
+    
+//     }
+    
+//     var privateKey = new Buffer(privKey, 'hex');
+//     var transaction = new ethTx(rawTx);
+//     transaction.sign(privateKey);
+//     var serializedTx = transaction.serialize().toString('hex');
+//     web3.eth.sendRawTransaction(
+//         '0x' + serializedTx, function(err, result) {
+//             if(err) {
+//                 console.log('error');
+//                 console.log(err);
+//             } else {
+//                 console.log('success');
+//                 console.log(result);
+//             }
+//         });
+// }
+
 

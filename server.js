@@ -49,7 +49,7 @@ app.post('/new-warranty', function(req, res) {
         // New customer - create a new contract
         var name = req.body.name;
         var id = req.body.id;
-        var warrantyserial = req.body.warrantyserial;
+        var warrantyserial = req.body.cya_warrantyserial;
         var model_id = req.body.model_id;
         var model_name = req.body.model_name;
         var manufacturer = req.body.manufacturer;
@@ -57,18 +57,14 @@ app.post('/new-warranty', function(req, res) {
         if( (name && id && warrantyserial && model_id && model_name && manufacturer) ===undefined ){
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
-            blockchain.creatNewCustomerContract(id, name).then(function(hash){
+            blockchain.creatNewCustomerContract(req.body).then(function(hash){
 
                 response["Tx Hash"] = hash;
                 res.json(response);
                
             });
         }
-
-
-    }
-
-    
+    }  
 });
 
 app.get('/get-warranties', function(req, res) {
