@@ -8,7 +8,7 @@ cps_public_key: '',
 cps_private_key: ''
 }
 try {
-    const credentials = require('./credentials')
+    credentials = require('./credentials')
 } catch (error) {
     console.log('No credentials found')
 
