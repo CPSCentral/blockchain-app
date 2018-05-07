@@ -30,7 +30,8 @@ web3.eth.defaultAccount = keys.cps_public_key;
 
 
 
-exports.creatNewCustomerContract = function(request_data) {
+
+exports.createNewCustomerContract = function(request_data) {
 
     var netId;
     var transactionCount;
@@ -54,6 +55,7 @@ exports.creatNewCustomerContract = function(request_data) {
                 };
     
                 web3.eth.accounts.signTransaction(rawTx, keys.cps_private_key).then(signed => {
+                    console.log('Signed...')
                     var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
                 
                     tran.on('transactionHash', hash => {
@@ -210,3 +212,4 @@ function sendSign(data, contractAddress){
    
 }
 
+this.createNewCustomerContract({"hey":"workd"})
