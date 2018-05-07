@@ -57,7 +57,7 @@ exports.createNewCustomerContract = function(request_data) {
                 web3.eth.accounts.signTransaction(rawTx, keys.cps_private_key).then(signed => {
                     console.log('Signed...')
                     var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
-                
+                   console.log(tran)
                     tran.on('transactionHash', hash => {
                       // Send response to client
                       console.log("Tx Hash: " +  hash);
