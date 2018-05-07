@@ -22,12 +22,14 @@ app.get('/get-address', function(req, res) {
 
 app.post('/new-warranty', function(req, res) {
     
+    console.log("Received request for new warranty...!")
     var response = {"repeating customer":false,
                     "Tx Hash":""}
 
     // First check if first time customer by looking for contract hash in request
     if (req.body.contract_address){
         // Repeating customer
+        console.log("Repeating customer!")
         response["repeating customer"] = true;
         var contract_address = req.body.contract_address;
         var warrantyserial = req.body.warrantyserial;
@@ -48,6 +50,7 @@ app.post('/new-warranty', function(req, res) {
 
     }else{
         // New customer - create a new contract
+        console.log("New customer!")
         var name = req.body.name;
         var id = req.body.id;
         var warrantyserial = req.body.cya_warrantyserial;
@@ -58,6 +61,7 @@ app.post('/new-warranty', function(req, res) {
         if( (name && id && warrantyserial && model_id && model_name && manufacturer) ===undefined ){
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
+           
             blockchain.creatNewCustomerContract(req.body).then(function(hash){
 
                 response["Tx Hash"] = hash;

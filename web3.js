@@ -34,7 +34,7 @@ exports.creatNewCustomerContract = function(request_data) {
 
     var netId;
     var transactionCount;
-
+    console.log("Deploying contract...")
     return new Promise(function(resolve,reject){
         web3.eth.net.getId().then(function(res){
             netId=res;
@@ -90,6 +90,8 @@ exports.creatNewCustomerContract = function(request_data) {
 
 function createCustomer(request_data, contractAddress){
 
+    console.log("Creating customer...")
+
     var contractInstance = new web3.eth.Contract(abi, contractAddress);
     var data = contractInstance.methods.createCustomer(request_data.name,request_data.id).encodeABI();
 
@@ -102,6 +104,7 @@ function createCustomer(request_data, contractAddress){
 
 function addWarranty(request_data, contractAddress ){
 
+    console.log("Adding warranty...")
     var contractInstance = new web3.eth.Contract(abi, address);
     var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.model_id, request_data.model_name, request_data.manufacturer).encodeABI();
     
