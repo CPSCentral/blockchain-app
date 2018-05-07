@@ -212,4 +212,3 @@ function sendSign(data, contractAddress){
    
 }
 
-this.createNewCustomerContract({"hey":"workd"})
