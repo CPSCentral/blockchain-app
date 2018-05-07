@@ -76,7 +76,9 @@ exports.createNewCustomerContract = function(request_data) {
 
                     });
                 
-                 //   tran.on('error',reject(false));
+                    tran.on('error',err=>{
+                        console.log(err)
+                    });
                   });
     
                   
