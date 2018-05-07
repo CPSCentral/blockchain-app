@@ -62,12 +62,13 @@ app.post('/new-warranty', function(req, res) {
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
            
-            blockchain.creatNewCustomerContract(req.body).then(function(hash){
-
+            blockchain.creatNewCustomerContract(req.body).then(function(hash,err){
+     
                 response["Tx Hash"] = hash;
+
                 res.json(response);
-               
-            });
+                
+            }); 
         }
     }  
 });
