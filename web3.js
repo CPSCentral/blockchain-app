@@ -22,14 +22,14 @@ const output = solc.compile(input.toString(), 1);
 const abi = JSON.parse(output.contracts[':CPS'].interface);
 // Connect to Infura Ethereum node
 const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ keys.network +".infura.io/"+keys.infura_api_key));
-
+console.log("https://"+ keys.network +".infura.io/"+keys.infura_api_key)
 const gasLimit = 3000000;
 const gasPrice = 2000000000; //2 gwei
 //2000000000 = 2 gwei
 web3.eth.defaultAccount = keys.cps_public_key;
 
 
-
+console.log(web3.eth.defaultAccount)
 
 exports.createNewCustomerContract = function(request_data) {
 
@@ -39,7 +39,7 @@ exports.createNewCustomerContract = function(request_data) {
     return new Promise(function(resolve,reject){
         web3.eth.net.getId().then(function(res){
             netId=res;
-
+console.log(netId)
             web3.eth.getTransactionCount(keys.cps_public_key).then(function(res){
                 transactionCount=res;
     
@@ -56,8 +56,9 @@ exports.createNewCustomerContract = function(request_data) {
     
                 web3.eth.accounts.signTransaction(rawTx, keys.cps_private_key).then(signed => {
                     console.log('Signed...')
+                    
                     var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
-                   console.log(tran)
+                //   console.log(tran)
                     tran.on('transactionHash', hash => {
                       // Send response to client
                       console.log("Tx Hash: " +  hash);
@@ -180,7 +181,7 @@ function sendSign(data, contractAddress){
         var rawTx = {
             nonce:  web3.utils.toHex(transactionCount),
             chainId: netId,//web3.utils.toHex(3),
-            gasLimit: web3.utils.toHex(gasLimit+1),
+            gasLimit: web3.utils.toHex(gasLimit),
              gasPrice: web3.utils.toHex(gasPrice),
              data:  web3.utils.toHex(data),
              from: keys.cps_public_key,
@@ -189,6 +190,7 @@ function sendSign(data, contractAddress){
         
         
          console.log('Sending signed ...')
+         console.log(rawTx)
          web3.eth.accounts.signTransaction(rawTx, keys.cps_private_key).then(signed => {
             console.log('Signing done, now sending...')
             var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
