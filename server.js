@@ -8,6 +8,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
+    console.log("request for /")
     res.json({ message: 'hooray! welcome to our api!' });   
 });
 
