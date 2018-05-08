@@ -104,10 +104,10 @@ function createCustomer(request_data, contractAddress){
 }
 
 
-var contractInstance = new web3.eth.Contract(abi, '0x26e9A41FFa520C20b81a23E4B4667886D398D638');
-contractInstance.methods.getWarrantyCount().call().then(res=>{
-    console.log(res)
-})
+// var contractInstance = new web3.eth.Contract(abi, '0x26e9A41FFa520C20b81a23E4B4667886D398D638');
+// contractInstance.methods.getWarrantyCount().call().then(res=>{
+//     console.log(res)
+// })
 
 function addFirstWarranty(request_data, contractAddress ){
 
