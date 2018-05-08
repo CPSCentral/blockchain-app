@@ -25,7 +25,7 @@ contract CPS {
 
     }
     
-    function getCustomer() public returns (uint, string) {
+    function getCustomer() public view returns (uint, string) {
       return (cya_customer.cya_id, cya_customer.name);
     }
     

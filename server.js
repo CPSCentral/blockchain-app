@@ -23,16 +23,16 @@ app.get('/get-address', function(req, res) {
 app.post('/new-warranty', function(req, res) {
     
     console.log("Received request for new warranty...!")
-    var response = {"repeating customer":false,
-                    "Tx Hash":""}
+    var response = {"repeating customer":false
+                    }
 
     // First check if first time customer by looking for contract hash in request
-    if (req.body.contract_address){
+    if (req.body.contract_tx_hash){
         // Repeating customer
         console.log("Repeating customer!")
         response["repeating customer"] = true;
-        var contract_address = req.body.contract_address;
-        var warrantyserial = req.body.warrantyserial;
+        var contract_address = req.body.contract_tx_hash;
+        var warrantyserial = req.body.cya_warrantyserial;
         var model_id = req.body.model_id;
         var model_name = req.body.model_name;
         var manufacturer = req.body.manufacturer;
@@ -42,8 +42,8 @@ app.post('/new-warranty', function(req, res) {
         }else{
 
             // Now update his existing contract
-            blockchain.addNewWarranty(contract_address, warrantyserial, model_id, model_name, manufacturer).then(function(hash){
-                response["New Warranty"]["Tx Hash"]=hash;
+            blockchain.addNewWarranty( req.body).then(function(hash){
+                response["Contract_Address"]=hash;
                 res.json(response);
             }) 
         }
@@ -75,8 +75,8 @@ app.post('/new-warranty', function(req, res) {
 
 app.get('/get-warranties', function(req, res) {
 
-    var contract_address = req.query.contract_address;
-
+    var contract_address = req.body.contract_tx_hash;
+    
     if (!contract_address){
         res.json({"message":"Transaction failed, missing required query parameter"})
     }else{
