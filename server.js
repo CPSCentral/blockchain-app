@@ -20,6 +20,20 @@ app.get('/get-address', function(req, res) {
   
 });
 
+function checkParams(req){
+    var contract_address = req.body.contract_tx_hash;
+    var warrantyserial = req.body.cya_warrantyserial;
+    var model_id = req.body.model_id;
+    var model_name = req.body.model_name;
+    var manufacturer = req.body.manufacturer;
+    var items = req.body.items;
+    var netType = req.body.netType;
+    if( ( warrantyserial && model_id && model_name && manufacturer && netType && items) ===undefined ){
+        return true;
+    }else{return false}
+
+}
+
 app.post('/new-warranty', function(req, res) {
     
     console.log("Received request for new warranty...!")
@@ -31,13 +45,9 @@ app.post('/new-warranty', function(req, res) {
         // Repeating customer
         console.log("Repeating customer!")
         response["repeating customer"] = true;
-        var contract_address = req.body.contract_tx_hash;
-        var warrantyserial = req.body.cya_warrantyserial;
-        var model_id = req.body.model_id;
-        var model_name = req.body.model_name;
-        var manufacturer = req.body.manufacturer;
 
-        if( ( warrantyserial && model_id && model_name && manufacturer) ===undefined ){
+
+        if(checkParams(req) ){
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
 
@@ -51,14 +61,8 @@ app.post('/new-warranty', function(req, res) {
     }else{
         // New customer - create a new contract
         console.log("New customer!")
-        var name = req.body.name;
-        var id = req.body.id;
-        var warrantyserial = req.body.cya_warrantyserial;
-        var model_id = req.body.model_id;
-        var model_name = req.body.model_name;
-        var manufacturer = req.body.manufacturer;
 
-        if( (name && id && warrantyserial && model_id && model_name && manufacturer) ===undefined ){
+      if(checkParams(req) ){
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
            
@@ -76,7 +80,7 @@ app.post('/new-warranty', function(req, res) {
 app.get('/get-warranties', function(req, res) {
 
     var contract_address = req.body.contract_tx_hash;
-    
+
     if (!contract_address){
         res.json({"message":"Transaction failed, missing required query parameter"})
     }else{

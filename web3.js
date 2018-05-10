@@ -17,18 +17,20 @@ const keys =  require('./keys')
 
 // Compile the source code
 const input = fs.readFileSync('contracts/CPS.sol');
-const output = solc.compile(input.toString(), 1);
 
+const output = solc.compile(input.toString(), 1);
+//console.log(output)
 const abi = JSON.parse(output.contracts[':CPS'].interface);
 // Connect to Infura Ethereum node
-const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ keys.network +".infura.io/"+keys.infura_api_key));
 
 const gasLimit = 3000000;
 const gasPrice = 2000000000; //2 gwei
 //2000000000 = 2 gwei
-web3.eth.defaultAccount = keys.cps_public_key;
+//web3.eth.defaultAccount = keys.cps_public_key;
 
 exports.createNewCustomerContract = function(request_data) {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[request_data.netType].infura_api_key));
 
     var netId;
     var transactionCount;
@@ -113,12 +115,14 @@ function addFirstWarranty(request_data, contractAddress ){
 
     console.log("Adding warranty.......")
     var contractInstance = new web3.eth.Contract(abi, contractAddress);
-    var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.model_id, request_data.model_name, request_data.manufacturer).encodeABI();
+    var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.model_id, request_data.model_name, request_data.manufacturer, request_data.items).encodeABI();
     
     sendSign(data, contractAddress, null, null);
 }
 
 exports.addNewWarranty = function(request_data){
+
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[request_data.netType].infura_api_key));
 
     // First get the contract address
     return new Promise(function(resolve,reject){
@@ -141,7 +145,10 @@ exports.addNewWarranty = function(request_data){
 
 
 
-exports.getWarranties = function(contract_address){
+exports.getWarranties = function(contract_address, netType){
+
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ netType +".infura.io/"+keys[netType].infura_api_key));
+
 
     var contractInstance = new web3.eth.Contract(abi, contract_address);
 
@@ -172,7 +179,9 @@ exports.getWarranties = function(contract_address){
 
 function sendSign(data, contractAddress, callbackFunction, request_data){
  
- 
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[netType].infura_api_key));
+
+
         var netId;
         var transactionCount;
 
