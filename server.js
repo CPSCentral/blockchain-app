@@ -79,9 +79,9 @@ app.post('/new-warranty', function(req, res) {
            
             blockchain.createNewCustomerContract(req.body).then(function(hash,err){
      
-                response["Tx Hash"] = hash;
+              //  response["Tx Hash"] = hash;
 
-                res.json(response);
+                res.json(hash);
                 
             }); 
         }
