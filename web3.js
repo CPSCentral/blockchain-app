@@ -97,12 +97,12 @@ exports.createNewCustomerContract = function(request_data) {
 function createNewCustomer(request_data, contractAddress){
 
     console.log("Creating customer...")
-console.log(contractAddress)
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[request_data.netType].infura_api_key));
+
     var contractInstance1 = new web3.eth.Contract(abi, contractAddress);
-    console.log('here1')
+
     var data = contractInstance1.methods.createCustomer(request_data.name,request_data.id).encodeABI();
-    console.log('here2')
-    
+
     sendSign(data, contractAddress, addFirstWarranty, request_data);
 
 }
@@ -117,14 +117,15 @@ console.log(contractAddress)
 // })
 
 function addFirstWarranty(request_data, contractAddress ){
-    console.log('here2')
+
     const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[request_data.netType].infura_api_key));
 
     console.log("Adding warranty.......")
     var contractInstance = new web3.eth.Contract(abi, contractAddress);
+
     var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.items, request_data.price).encodeABI();
-    
-    sendSign(data, contractAddress, null, null);
+
+    sendSign(data, contractAddress, null, request_data);
 }
 
 exports.addNewWarranty = function(request_data){
@@ -186,7 +187,7 @@ exports.getWarranties = function(contract_address, netType){
 
 function sendSign(data, contractAddress, callbackFunction, request_data){
  
-    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[netType].infura_api_key));
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://"+ request_data.netType +".infura.io/"+keys[request_data.netType].infura_api_key));
 
 
         var netId;
