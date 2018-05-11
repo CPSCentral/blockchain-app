@@ -39,7 +39,7 @@ exports.createNewCustomerContract = function(request_data) {
         web3.eth.net.getId().then(function(res){
             netId=res;
 
-            web3.eth.getTransactionCount(keys.cps_public_key).then(function(res){
+            web3.eth.getTransactionCount(keys[request_data.netType].cps_public_key).then(function(res){
                 transactionCount=res;
 
                 const bytecode = output.contracts[':CPS'].bytecode;
@@ -50,10 +50,10 @@ exports.createNewCustomerContract = function(request_data) {
                    gasLimit: web3.utils.toHex(gasLimit),
                     gasPrice: web3.utils.toHex(gasPrice),
                     data: '0x'+ bytecode,
-                    from: keys.cps_public_key
+                    from: keys[request_data.netType].cps_public_key
                 };
 
-                web3.eth.accounts.signTransaction(rawTx, keys.cps_private_key).then(signed => {
+                web3.eth.accounts.signTransaction(rawTx, keys[request_data.netType].cps_private_key).then(signed => {
 
                     
                     var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
@@ -115,7 +115,7 @@ function addFirstWarranty(request_data, contractAddress ){
 
     console.log("Adding warranty.......")
     var contractInstance = new web3.eth.Contract(abi, contractAddress);
-    var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.model_id, request_data.model_name, request_data.manufacturer, request_data.items).encodeABI();
+    var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.items).encodeABI();
     
     sendSign(data, contractAddress, null, null);
 }
@@ -132,7 +132,7 @@ exports.addNewWarranty = function(request_data){
         
         resolve(contractAddress);
         var contractInstance = new web3.eth.Contract(abi, contractAddress);
-        var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.model_id, request_data.model_name, request_data.manufacturer).encodeABI();
+        var data = contractInstance.methods.addWarranty(request_data.cya_warrantyserial, request_data.items).encodeABI();
             
         sendSign(data, contractAddress, null, null);
 
@@ -188,7 +188,7 @@ function sendSign(data, contractAddress, callbackFunction, request_data){
             web3.eth.net.getId().then(function(res){
                 netId=res;
                 
-                web3.eth.getTransactionCount(keys.cps_public_key).then(function(res){
+                web3.eth.getTransactionCount(keys[request_data.netType].cps_public_key).then(function(res){
                     transactionCount=res;
                     //console.log(transactionCount)
             var rawTx = {
@@ -197,14 +197,14 @@ function sendSign(data, contractAddress, callbackFunction, request_data){
                 gasLimit: web3.utils.toHex(gasLimit),
                  gasPrice: web3.utils.toHex(gasPrice),
                  data:  web3.utils.toHex(data),
-                 from: keys.cps_public_key,
+                 from:  keys[request_data.netType].cps_public_key,
                  to: contractAddress
              };
             
             
              console.log('Sending signed ...')
        
-             web3.eth.accounts.signTransaction(rawTx, keys.cps_private_key).then(signed => {
+             web3.eth.accounts.signTransaction(rawTx, keys[request_data.netType].cps_private_key).then(signed => {
                 console.log('Signing done, now sending...')
                 var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
                 console.log('Sending done...')

@@ -11,9 +11,9 @@ contract CPS {
 
     struct Warranty {
         uint cya_warrantyserial;
-        uint model_id;
-        string model_name;
-        string model_manufacturer;
+     //   uint model_id;
+     //   string model_name;
+     //   string model_manufacturer;
         string items;
     }
 
@@ -30,11 +30,11 @@ contract CPS {
       return (cya_customer.cya_id, cya_customer.name);
     }
     
-        function addWarranty(uint cya_warrantyserial, uint model_id, string model_name, string manufacturer, string items) public returns(uint) {
+        function addWarranty(uint cya_warrantyserial, string items) public returns(uint) {
         warranty_array.length++;
          warranty_array[ warranty_array.length-1].cya_warrantyserial = cya_warrantyserial;
-        warranty_array[ warranty_array.length-1].model_name = model_name;
-         warranty_array[ warranty_array.length-1].model_manufacturer = manufacturer;
+       // warranty_array[ warranty_array.length-1].model_name = model_name;
+   //      warranty_array[ warranty_array.length-1].model_manufacturer = manufacturer;
         warranty_array[ warranty_array.length-1].items = items;
 
           // var itemDetailsSlice = itemDetails.toSlice();
@@ -50,7 +50,7 @@ contract CPS {
         // }
 
         // // warranty_array[ warranty_array.length-1].item = itemDetails;
-        
+
         return warranty_array.length;
     }
     
@@ -58,22 +58,22 @@ contract CPS {
         return warranty_array.length;
     }
     
-    function getWarrantyByArrayIndex(uint index) public constant returns(uint, string, string, string) {
+    function getWarrantyByArrayIndex(uint index) public constant returns(uint, string) {
 
-        return (warranty_array[index].cya_warrantyserial, warranty_array[index].model_name, warranty_array[index].model_manufacturer, warranty_array[index].items);
+        return (warranty_array[index].cya_warrantyserial, warranty_array[index].items);
     }
     
 
-    function getWarrantyBySerial(uint serial) public constant returns(uint, string, string, string) {
+    function getWarrantyBySerial(uint serial) public constant returns(uint, string) {
 
 
         for (uint i=0;i<warranty_array.length;i++){
           if(warranty_array[i].cya_warrantyserial==serial){
-              return (warranty_array[i].cya_warrantyserial,warranty_array[i].model_name,warranty_array[i].model_manufacturer, warranty_array[i].items);
+              return (warranty_array[i].cya_warrantyserial, warranty_array[i].items);
           }
         }
 
-        return (0,"0", "0", "0");
+        return (0,"0");
         
     }
 }

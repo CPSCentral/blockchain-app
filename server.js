@@ -23,12 +23,10 @@ app.get('/get-address', function(req, res) {
 function checkParams(req){
     var contract_address = req.body.contract_tx_hash;
     var warrantyserial = req.body.cya_warrantyserial;
-    var model_id = req.body.model_id;
-    var model_name = req.body.model_name;
-    var manufacturer = req.body.manufacturer;
+
     var items = req.body.items;
     var netType = req.body.netType;
-    if( ( warrantyserial && model_id && model_name && manufacturer && netType && items) ===undefined ){
+    if( ( warrantyserial && netType && items) ===undefined ){
         return true;
     }else{return false}
 
