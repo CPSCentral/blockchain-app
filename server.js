@@ -20,15 +20,25 @@ app.get('/get-address', function(req, res) {
   
 });
 
-function checkParams(req){
+function checkParams(req, firstTime){
     var contract_address = req.body.contract_tx_hash;
     var warrantyserial = req.body.cya_warrantyserial;
     var price = req.body.price;
     var items = req.body.items;
     var netType = req.body.netType;
 
+    var email=false;
+    var id=false;
 
-    if( ( warrantyserial && netType && items && price) ===undefined ){
+    if (firstTime){
+        email=req.body.email;
+        id=req.body.id
+    }else{
+        email = true;
+        id =true ;
+    }
+   // console.log(email)
+    if( ( warrantyserial && netType && items && price && email && id) ===undefined ){
         return true;
     }else{return false}
 
@@ -37,6 +47,7 @@ function checkParams(req){
 app.post('/new-warranty', function(req, res) {
     
     console.log("Received request for new warranty...!")
+    console.log(req.body)
     var response = {"repeating customer":false
                     }
 
@@ -47,7 +58,7 @@ app.post('/new-warranty', function(req, res) {
         response["repeating customer"] = true;
 
 
-        if(checkParams(req) ){
+        if(checkParams(req, firstTime=false) ){
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
 
@@ -62,7 +73,7 @@ app.post('/new-warranty', function(req, res) {
         // New customer - create a new contract
         console.log("New customer!")
 
-      if(checkParams(req) ){
+      if(checkParams(req, firstTime=true) ){
             res.json({"message":"Transaction failed, missing required parameter"})
         }else{
            
