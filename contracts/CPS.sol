@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 contract CPS {
 
     struct CYACustomer {
-      string name;
+      string email;
       uint cya_id;
 
     }
@@ -21,14 +21,14 @@ contract CPS {
     CYACustomer public cya_customer;
     Warranty[] warranty_array;
 
-    function createCustomer(string name, uint id) public {
+    function createCustomer(string email, uint id) public {
 
-       cya_customer = CYACustomer(name,id);
+       cya_customer = CYACustomer(email,id);
 
     }
     
     function getCustomer() public view returns (uint, string) {
-      return (cya_customer.cya_id, cya_customer.name);
+      return (cya_customer.cya_id, cya_customer.email);
     }
     
         function addWarranty(uint cya_warrantyserial, string items, string price) public returns(uint) {

@@ -101,7 +101,7 @@ function createNewCustomer(request_data, contractAddress){
 
     var contractInstance1 = new web3.eth.Contract(abi, contractAddress);
 
-    var data = contractInstance1.methods.createCustomer(request_data.name,request_data.id).encodeABI();
+    var data = contractInstance1.methods.createCustomer(request_data.email,request_data.id).encodeABI();
 
     sendSign(data, contractAddress, addFirstWarranty, request_data);
 
